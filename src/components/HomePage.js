@@ -3,8 +3,10 @@ import './app.css';
 import { Link } from "react-router-dom";
 import axios from "axios";
 import CanvasJSReact from './canvasjs.react';
+import ReactPaginate from 'react-paginate';
 //var CanvasJSReact = require('./canvasjs.react');
 var CanvasJS = CanvasJSReact.CanvasJS;
+
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 class Home extends Component {
   constructor() {
@@ -12746,13 +12748,21 @@ class Home extends Component {
        kocchi:"",
        punewarrior:"",
        counter:1,
-       items:[]
+       items:[],
+       pageSize : 6,
+       pageIndex : 0,
+       count2:""
      
     };
   }
- 
+  handlePageClick = (event) => {
+    //const selectedPage = data.selected;
+    //const offset = selectedPage * this.state.perPage;
+    this.setState({pageIndex: event.selected })
+    console.log(this.state.pageIndex)
+  }
   componentDidMount() {
-
+   this.setState({count2:this.state.data.length})
    const royal = this.state.data.filter(word => word.winner=="Royal Challengers Bangalore" )
     this.setState({rcb:royal})
     const csks=this.state.data.filter(word => word.winner=="Chennai Super Kings" )
@@ -12784,9 +12794,13 @@ class Home extends Component {
 
  renderTableData() {
   
+  const product = this.state.data;
 
-
-  return this.state.data.map((btc) => {
+    return product.slice(
+    this.state.pageIndex * this.state.pageSize,
+    this.state.pageIndex * this.state.pageSize + this.state.pageSize
+  )
+  .map((btc) => {
     const {
       season,
       date,
@@ -12850,6 +12864,31 @@ class Home extends Component {
                 ]
        }]
    }
+   let paginationElement;
+   if (this.state.count2 > 1) {
+     paginationElement = (
+       <ReactPaginate
+         previousLabel={"← Previous"}
+         nextLabel={"Next →"}
+         //breakLabel={}
+         pageCount={this.state.count2/6}
+         pageRangeDisplayed = {10}
+         onPageChange={(event)=>this.handlePageClick(event)}
+         marginPagesDisplayed ={6}
+         breakClassName={'page-item'}
+         breakLinkClassName={'page-link'}
+         containerClassName={'pagination'}
+         pageClassName={'page-item'}
+         pageLinkClassName={'page-link'}
+         previousClassName={'page-item'}
+         previousLinkClassName={'page-link'}
+         nextClassName={'page-item'}
+         nextLinkClassName={'page-link'}
+         activeClassName={'active'}
+         initialPage = {0}
+       />
+     );
+   }
     return (
         <div >
              <div style={{paddingTop:"50px"}}>
@@ -12865,6 +12904,9 @@ class Home extends Component {
            { this.renderTableData()}
            </div>
            </div>
+           <div  className="pager d-flex justify-content-center py-5">
+         {paginationElement}
+         </div>
            </div>
           
       </div>     
